@@ -20,11 +20,6 @@ jobs:
       run: cargo build --verbose --release --all
     - name: Run tests
       run: cargo test --verbose
-    - name: Release
-      uses: actions/upload-artifact@v3
-      with:
-        name: student_pairs
-        path: target/release/student_pairs
     - uses: actions/cache@v3
       with:
         path: |
@@ -34,3 +29,20 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+  release:
+
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: fnkr/github-action-ghr@v1
+        env:
+          GHR_COMPRESS: xz
+          GHR_PATH: target/release/student_pairs
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
