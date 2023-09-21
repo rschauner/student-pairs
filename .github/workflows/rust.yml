@@ -17,6 +17,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --release --all
     - name: Run tests
       run: cargo test --verbose
+    - name: Release
+      uses: actions/upload-artifact@v3
+      with:
+        name: student_pairs
+        path: target/release/student_pairs
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
